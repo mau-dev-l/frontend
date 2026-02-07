@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VISOP 2.0 - Visor de Obra Pública</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.polylinemeasure/Leaflet.PolylineMeasure.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.polylinemeasure/Leaflet.PolylineMeasure.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+</head>
+<body>
+
+    <div class="geoportal-container">
+        <header class="geoportal-header">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white w-100 shadow-sm" style="border-bottom: 2px solid #C68A2C;">
+                <div class="container-fluid">
+                    <a class="navbar-brand d-flex align-items-center" href="#" style="color: #C68A2C; font-weight: bold;">
+                        <img src="assets/ayuntamiento-logo-color-web.png" alt="Logo Ayuntamiento" style="height: 35px; margin-right: 10px;">
+                        <span>Visor de Obra Pública</span>
+                    </a>
+                    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <div class="d-flex align-items-center ms-auto">
+                            <a class="navbar-brand" href="#">
+                                <img src="assets/logo_iciplam.png" alt="Logo ICIPLAM" style="height: 35px;" class="me-2">
+                            </a>
+                            <a class="navbar-brand" href="#">
+                                <img src="assets/4.png" alt="Logo 4" style="height: 35px;" class="me-3">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <aside class="geoportal-sidebar bg-light">
+            <div class="sidebar-desktop-content p-3">
+                
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #6a0dad; color: white; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapseStats">
+                        <span><strong><i class="fa-solid fa-chart-pie"></i> Estadísticas</strong></span>
+                        <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <div id="collapseStats" class="collapse show">
+                        <div class="card-body">
+                            <p class="small text-muted mb-2">Comparativa FAISMUN 2023 - 2025</p>
+                            <button id="btn-abrir-dashboard" class="btn btn-sm w-100 text-white" style="background-color: #6a0dad;">
+                                <i class="fa-solid fa-chart-simple"></i> Ver Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                     <div class="card-header d-flex justify-content-between align-items-center" id="headingCapas" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapseCapas">
+                        <span><strong>Capas</strong></span>
+                        <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <div id="collapseCapas" class="collapse show">
+                        <div class="card-body">
+                            <small class="text-muted">Capas Base (Arrastrables)</small>
+                            <hr class="my-2">
+                            
+                            <div id="capas-poligonos-ordenables">
+                                <div class="d-flex align-items-center layer-item">
+                                    <i class="fa-solid fa-grip-vertical drag-handle text-muted me-2" style="cursor: grab;"></i>
+                                    <div class="form-check form-switch flex-grow-1">
+                                        <input class="form-check-input" type="checkbox" id="checkLimiteMunicipal">
+                                        <label class="form-check-label" for="checkLimiteMunicipal">Límite Municipal</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center layer-item">
+                                    <i class="fa-solid fa-grip-vertical drag-handle text-muted me-2" style="cursor: grab;"></i>
+                                    <div class="form-check form-switch flex-grow-1">
+                                        <input class="form-check-input" type="checkbox" id="checkColonias">
+                                        <label class="form-check-label" for="checkColonias">Colonias</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center layer-item">
+                                    <i class="fa-solid fa-grip-vertical drag-handle text-muted me-2" style="cursor: grab;"></i>
+                                    <div class="form-check form-switch flex-grow-1">
+                                        <input class="form-check-input" type="checkbox" id="checkZAP">
+                                        <label class="form-check-label" for="checkZAP">ZAP</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center layer-item">
+                                    <i class="fa-solid fa-grip-vertical drag-handle text-muted me-2" style="cursor: grab;"></i>
+                                    <div class="form-check form-switch flex-grow-1">
+                                        <input class="form-check-input" type="checkbox" id="checkManzanas">
+                                        <label class="form-check-label" for="checkManzanas">Manzanas</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center layer-item">
+                                    <i class="fa-solid fa-grip-vertical drag-handle text-muted me-2" style="cursor: grab;"></i>
+                                    <div class="form-check form-switch flex-grow-1">
+                                        <input class="form-check-input" type="checkbox" id="checkPrediosCB01">
+                                        <label class="form-check-label" for="checkPrediosCB01">Predios (CB 01)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <small class="text-muted mt-3 d-block">Puntos de Interés</small>
+                            <hr class="my-2">
+                            
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="checkFAISMUN_All">
+                                <label class="form-check-label" for="checkFAISMUN_All"><strong>Obras FAISMUN (Todas)</strong></label>
+                            </div>
+                            <div class="ms-3 mt-1"> 
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="checkFAISMUN2025" checked>
+                                    <label class="form-check-label" for="checkFAISMUN2025">FAISMUN 2025</label>
+                                </div>
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="checkFAISMUN">
+                                    <label class="form-check-label" for="checkFAISMUN">FAISMUN 2024</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="checkFAISMUNLineas">
+                                    <label class="form-check-label" for="checkFAISMUNLineas">FAISMUN 2024 (Líneas)</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="checkFAISMUN2023">
+                                    <label class="form-check-label" for="checkFAISMUN2023">FAISMUN 2023</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header collapsed d-flex justify-content-between align-items-center" id="headingHerramientas" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapseHerramientas">
+                        <span><strong>Herramientas</strong></span>
+                        <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <div id="collapseHerramientas" class="collapse">
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button id="btn-zoom-home" class="btn btn-sm btn-custom-tuxtla w-100" type="button">
+                                    <i class="fa-solid fa-house-chimney"></i> Restablecer Vista
+                                </button>
+                                
+                                <button id="btn-native-gps" class="btn btn-sm btn-primary w-100" type="button">
+                                    <i class="fa-solid fa-location-crosshairs"></i> Mi Ubicación (GPS)
+                                </button>
+
+                                <button id="btn-clean-gps" class="btn btn-sm btn-outline-danger w-100" type="button" style="display: none;">
+                                    <i class="fa-solid fa-trash-can"></i> Limpiar Ubicación
+                                </button>
+                            </div>
+                            <hr class="my-3">
+                            <div>
+                                <label for="coord-input" class="form-label small"><strong>Buscar por Coordenadas</strong></label>
+                                <input type="text" class="form-control form-control-sm mb-2" id="coord-input" placeholder="Ej: 16.753, -93.116">
+                                <button id="btn-coord-search" class="btn btn-sm btn-custom-tuxtla w-100" type="button">Buscar</button>
+                                
+                                <button id="btn-clean-coords" class="btn btn-sm btn-outline-danger w-100 mt-2" type="button" style="display: none;">
+                                    <i class="fa-solid fa-eraser"></i> Limpiar Búsqueda
+                                </button>
+                                
+                                <div id="coord-error" class="form-text text-danger small mt-1"></div>
+                            </div>
+                            <hr class="my-3">
+                            <div>
+                                <label for="data-input" class="form-label small"><strong>Buscar por Datos</strong></label>
+                                <input type="text" class="form-control form-control-sm mb-2" id="data-input" placeholder="Ej: Las Granjas">
+                                <button id="btn-data-search" class="btn btn-sm btn-custom-tuxtla w-100" type="button">Buscar</button>
+                                <div id="data-error" class="form-text text-danger small mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </aside>
+
+        <main class="geoportal-main">
+            <div id="map-container"></div>
+            
+            <div id="grafica-panel" class="bg-light shadow-lg">
+                <div class="grafica-header d-flex justify-content-between align-items-center p-2 border-bottom">
+                    <span id="grafica-titulo" class="fw-bold small">Estadísticas</span>
+                    <button id="btn-cerrar-grafica" class="btn-close" title="Cerrar"></button>
+                </div>
+                <div class="grafica-body p-1">
+                    <div id="grafica-chart-div"></div>
+                </div>
+            </div>
+
+            <div id="leyenda-dinamica" class="legend-container">
+                <div class="legend-header">
+                    <i class="fa-solid fa-list-ul"></i> Simbología
+                </div>
+                <div id="leyenda-content" class="legend-body">
+                    </div>
+            </div>
+
+            <div id="panel-demografico" class="dashboard-footer">
+                <button id="btn-toggle-demografico" class="btn-toggle-footer">
+                    <i class="fa-solid fa-people-group"></i> Demografía Tuxtla
+                </button>
+                
+                <div class="cards-container">
+                    <div class="kpi-card">
+                        <div class="icon-box bg-primary-subtle text-primary">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Población Total</h6>
+                            <h4 class="fw-bold mb-0" id="kpi-pob-total">...</h4>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="icon-box bg-info-subtle text-info">
+                            <i class="fa-solid fa-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Hombres</h6>
+                            <h4 class="fw-bold mb-0" id="kpi-pob-mas">...</h4>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="icon-box bg-danger-subtle text-danger">
+                            <i class="fa-solid fa-person-dress"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Mujeres</h6>
+                            <h4 class="fw-bold mb-0" id="kpi-pob-fem">...</h4>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="icon-box bg-warning-subtle text-warning">
+                            <i class="fa-solid fa-person-breastfeeding"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Jefatura Fem.</h6>
+                            <h4 class="fw-bold mb-0" id="kpi-jefatura">...</h4>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="icon-box bg-success-subtle text-success">
+                            <i class="fa-solid fa-house-chimney"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Tot. Viviendas</h6>
+                            <h4 class="fw-bold mb-0" id="kpi-viviendas">...</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="geoportal-footer text-center py-2">
+            © 2025 CSIyG. Instituto Ciudadano de Planeación Municipal (ICIPLAM)
+        </footer>
+    </div>
+
+    <div class="modal fade" id="modalDashboard" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Dashboard de Obras</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light-subtle">
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body p-4" style="border-left: 5px solid #FFD700;">
+                                    <h6 class="text-muted text-uppercase fw-bold mb-1">Total Obras 2025</h6>
+                                    <h2 class="mb-0 fw-bold display-6" id="kpi-total-2025">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body p-4" style="border-left: 5px solid #0077b6;">
+                                    <h6 class="text-muted text-uppercase fw-bold mb-1">Total Obras 2024</h6>
+                                    <h2 class="mb-0 fw-bold display-6" id="kpi-total-2024">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body p-4" style="border-left: 5px solid #2a9d8f;">
+                                    <h6 class="text-muted text-uppercase fw-bold mb-1">Total Obras 2023</h6>
+                                    <h2 class="mb-0 fw-bold display-6" id="kpi-total-2023">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <div id="chart-pie-2025" style="width:100%; height:350px;"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div id="chart-pie-2024" style="width:100%; height:350px;"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div id="chart-pie-2023" style="width:100%; height:350px;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="js/capacitor.js"></script>
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
