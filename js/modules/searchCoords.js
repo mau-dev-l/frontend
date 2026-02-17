@@ -1,7 +1,7 @@
 // frontend/js/modules/searchCoords.js
 
 export function setupCoordSearch(map) {
-    console.log("📍 Módulo Búsqueda Coordenadas iniciado (Con Limpieza Mutua)");
+    console.log("Módulo Búsqueda Coordenadas iniciado (Con Limpieza Mutua)");
 
     const input = document.getElementById('coord-input');
     const btnSearch = document.getElementById('btn-coord-search');
@@ -54,7 +54,7 @@ export function setupCoordSearch(map) {
             return;
         }
 
-        // 🔥 LIMPIEZA MUTUA: Si el GPS está activo, lo apagamos
+        // LIMPIEZA MUTUA: Si el GPS está activo, lo apagamos
         if (window.limpiarGPS) window.limpiarGPS();
 
         // Limpiar búsqueda anterior propia

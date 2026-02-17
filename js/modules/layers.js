@@ -9,7 +9,7 @@ import {
 
 export async function cargarCapasBackend() {
     const capas = {};
-    console.log("🌍 Conectando a GeoServer (Tuxtla)...");
+    console.log("Conectando a GeoServer (Tuxtla)...");
 
     // ============================================================
     //  GRUPO 1: CAPAS WFS (Vectores Interactivos - GeoJSON)
@@ -98,8 +98,46 @@ export async function cargarCapasBackend() {
                 layer.bindPopup(html);
             }
         });
-        console.log(`✅ FAISMUN 25 (Líneas): ${dF25.features.length} registros`);
+        console.log(`FAISMUN 25 (Líneas): ${dF25.features.length} registros`);
     }
+
+    console.log("Conectando PIM 2025...");
+try {
+    // A. Capa de Imagen (WMS) para que se vea rápido y bonito
+    const pimWms = L.tileLayer.wms(`${GEOSERVER_BASE_URL}/visop/wms`, {
+        layers: 'visop:pim_2025',
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.0',
+        zIndex: 1000
+    });
+
+    // B. Capa de Datos (WFS) para la interactividad (Popups)
+    const dPim = await fetchWFS('pim_2025');
+    if (dPim?.features) {
+        const pimWfs = L.geoJSON(dPim, {
+            // Hacemos los puntos invisibles porque ya los dibuja el WMS
+            pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 12, opacity: 0, fillOpacity: 0, color: 'transparent', weight: 0 }),
+            onEachFeature: (feature, layer) => {
+                // Usamos tu función de popup premium
+                layer.bindPopup(crearPopupPIM(feature.properties));
+            }
+        });
+
+        // C. Lógica de "Capa Maestra" (Sincroniza WFS con WMS)
+        const originalOnAdd = pimWfs.onAdd.bind(pimWfs);
+        const originalOnRemove = pimWfs.onRemove.bind(pimWfs);
+        
+        pimWfs.onAdd = function(map) { originalOnAdd(map); pimWms.addTo(map); return this; };
+        pimWfs.onRemove = function(map) { originalOnRemove(map); map.removeLayer(pimWms); return this; };
+
+        // Guardar en el objeto principal
+        capas.pim2025 = pimWfs;
+        console.log(`✅ PIM 2025 cargado: ${dPim.features.length} registros`);
+    }
+} catch (error) {
+    console.error("❌ Error cargando PIM 2025:", error);
+}
 
     // 1. FAISMUN 2024 (Puntos)
     const dF24 = await fetchWFS('faismun_2024_geo');
@@ -108,7 +146,7 @@ export async function cargarCapasBackend() {
             pointToLayer: (f, latlng) => L.marker(latlng, { icon: iconoFAISMUN }),
             onEachFeature: popupFAISMUN
         });
-        console.log(`✅ FAISMUN 24 (Puntos): ${dF24.features.length} registros`);
+        console.log(`FAISMUN 24 (Puntos): ${dF24.features.length} registros`);
     }
 
     // 2. FAISMUN 2024 (Líneas)
@@ -132,7 +170,7 @@ export async function cargarCapasBackend() {
                 layer.bindPopup(contenidoHtml);
             }
         });
-        console.log(`✅ FAISMUN 24 (Líneas): ${dF24Lin.features.length} registros`);
+        console.log(`FAISMUN 24 (Líneas): ${dF24Lin.features.length} registros`);
     }
 
     // 3. FAISMUN 2023 (Puntos)
@@ -142,7 +180,7 @@ export async function cargarCapasBackend() {
             pointToLayer: (f, latlng) => L.marker(latlng, { icon: iconoFAISMUN23 }),
             onEachFeature: popupFAISMUN
         });
-        console.log(`✅ FAISMUN 23: ${dF23.features.length} registros`);
+        console.log(`FAISMUN 23: ${dF23.features.length} registros`);
     }
 
     // 4. Colonias
@@ -152,7 +190,7 @@ export async function cargarCapasBackend() {
             style: estiloColonias, 
             onEachFeature: popupGenerico 
         });
-        console.log(`✅ Colonias: ${dCol.features.length} registros`);
+        console.log(`Colonias: ${dCol.features.length} registros`);
     }
 
     // ============================================================
@@ -204,7 +242,7 @@ export async function cargarCapasBackend() {
                 layer.bindPopup(html);
             }
         });
-        console.log(`✅ ZAP 2026: ${dZap.features.length} zonas cargadas`);
+        console.log(`ZAP 2026: ${dZap.features.length} zonas cargadas`);
     }
 
     // 6. Manzanas
@@ -242,4 +280,72 @@ export async function cargarCapasBackend() {
     });
 
     return capas;
+}
+function crearPopupPIM(p) {
+    const nombreObra = p['Nombre de'] || 'NOMBRE NO DISPONIBLE';
+    const descripcion = p['Descrició'] || 'Sin descripción'; 
+    const clavePres = p['Clave Pres'] || '';
+    const noAprob = p['No de Apro'] || 'S/D';
+    const noContrato = p['No de Cont'] || 'S/D';
+    const tipoProy = p['Tipo de Pr'] || 'Infraestructura';
+    const avanceFis = p['Avance Fis'] || '0';
+    const avanceFin = p['Avance Fin'] || '0';
+    const unidadRes = p['Unidad Res'] || 'S/D';
+    const colonia = p['Colonia'] || 'Sin colonia asignada';
+    
+    let montoFormat = '$0.00';
+    try { 
+        const valor = p['Monto Apro']; 
+        if (valor) {
+            const numero = parseFloat(String(valor).replace(/[^0-9.-]+/g,""));
+            montoFormat = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(numero); 
+        }
+    } catch(e) {}
+
+    const safeNombre = nombreObra.replace(/"/g, '&quot;');
+    const safeCve = String(clavePres).trim();
+    
+    let descList = descripcion.replace(/(\d+\.-)/g, '<br><strong style="color:#000;">$1</strong>');
+    if (descList.startsWith('<br>')) descList = descList.substring(4);
+
+    return `
+        <div style="font-family: 'Segoe UI', sans-serif; min-width: 320px; max-width: 340px;">
+            <div style="background-color: #00897B; color: white; padding: 10px; font-weight: bold; border-radius: 5px 5px 0 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-helmet-safety"></i> PIM 2025
+            </div>
+            <div style="padding: 15px; background: white; border: 1px solid #ddd; border-top: none;">
+                <div style="font-weight: 800; color: #004D40; font-size: 13px; margin-bottom: 12px;">${nombreObra}</div>
+                <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">DESCRIPCIÓN</div>
+                <div style="background: #E0F2F1; border-left: 4px solid #00897B; padding: 8px; font-size: 12px; margin-bottom: 15px;">${descList}</div>
+
+                <button onclick="window.abrirGaleria('${safeCve}', '${safeNombre}', 'pim_2025', 'png')" 
+                    class="btn btn-outline-dark btn-sm w-100 mb-3" 
+                    style="border-radius: 4px; font-weight: 600; padding: 6px; font-size: 13px; border-color: #004D40; color: #004D40;">
+                    <i class="fa-solid fa-camera me-1"></i> Ver Evidencia
+                </button>
+
+                <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; font-size: 11px; color: #333;">
+                    <strong style="color: #00796B;"><i class="fa-solid fa-map-location-dot"></i> Colonia:</strong> ${colonia}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; margin-bottom: 15px; color: #333;">
+                    <div><strong style="color: #00796B;">No. Aprob:</strong><br>${noAprob}</div>
+                    <div><strong style="color: #00796B;">Contrato:</strong><br>${noContrato}</div>
+                    <div><strong style="color: #00796B;">Clave:</strong><br>${clavePres}</div>
+                    <div><strong style="color: #00796B;">Tipo:</strong><br>${tipoProy}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div style="background-color: #E0F7FA; padding: 5px; text-align: center; border: 1px solid #B2EBF2;">
+                        <strong style="color: #006064; font-size: 11px; display: block;">Físico</strong>
+                        <span style="font-weight: 800; font-size: 14px; color: #006064;">${avanceFis}%</span>
+                    </div>
+                    <div style="background-color: #F1F8E9; padding: 5px; text-align: center; border: 1px solid #DCEDC8;">
+                        <strong style="color: #33691E; font-size: 11px; display: block;">Finan.</strong>
+                        <span style="font-weight: 800; font-size: 14px; color: #33691E;">${avanceFin}%</span>
+                    </div>
+                </div>
+                <div style="background: #E0F2F1; text-align: right; padding: 8px; font-weight: bold; color: #00695C;">Monto: ${montoFormat}</div>
+            </div>
+        </div>
+    `;
 }

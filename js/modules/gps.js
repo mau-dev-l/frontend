@@ -1,7 +1,7 @@
 // frontend/js/modules/gps.js
 
 export function setupGPS(map) {
-    console.log("🛰️ Módulo GPS iniciado (Con Limpieza Mutua)");
+    console.log("Módulo GPS iniciado (Con Limpieza Mutua)");
 
     const btnGPS = document.getElementById('btn-native-gps');
     const btnClean = document.getElementById('btn-clean-gps');
@@ -29,7 +29,7 @@ export function setupGPS(map) {
         btnGPS.disabled = false;
         btnGPS.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Mi Ubicación (GPS)';
         
-        console.log("🧹 GPS limpiado.");
+        console.log(" GPS limpiado.");
     };
 
     // --- 2. ACTIVAR GPS ---
@@ -59,7 +59,7 @@ export function setupGPS(map) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude, accuracy } = position.coords;
-                console.log(`📍 GPS encontrado: ${latitude}, ${longitude}`);
+                console.log(`GPS encontrado: ${latitude}, ${longitude}`);
 
                 // Volar al punto
                 map.flyTo([latitude, longitude], 18, { duration: 1.5 });
@@ -89,9 +89,9 @@ export function setupGPS(map) {
                 btnGPS.disabled = false;
             },
             (error) => {
-                console.warn(`❌ Error GPS: ${error.message}`);
+                console.warn(`Error GPS: ${error.message}`);
                 let msg = "No se pudo obtener tu ubicación.";
-                if (error.code === 1) msg = "⚠️ Permiso denegado.";
+                if (error.code === 1) msg = "Permiso denegado.";
                 
                 alert(msg);
                 btnGPS.innerHTML = originalContent;

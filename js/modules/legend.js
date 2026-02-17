@@ -1,7 +1,7 @@
 // frontend/js/modules/legend.js
 
 export function initLegend(map, capas) {
-    console.log("🗺️ Iniciando Leyenda Dinámica (Sincronizada)...");
+    console.log("Iniciando Leyenda Dinámica (Sincronizada)...");
 
     const container = document.getElementById('leyenda-dinamica');
     const content = document.getElementById('leyenda-content');
@@ -45,7 +45,7 @@ export function initLegend(map, capas) {
         { 
             layer: capas.zap, 
             label: 'Zonas Atención (ZAP)', 
-            // 🔥 TIPO NUEVO: CONTORNO (HUECO) 🔥
+            // TIPO NUEVO: CONTORNO (HUECO) 
             type: 'polygon-outline', 
             color: '#FF6600'  // Naranja
         },
@@ -108,7 +108,7 @@ function getSymbolHTML(item) {
         // Cuadrito relleno normal
         style = `background-color: ${item.color}; opacity: 0.6; border: 1px solid ${item.color}; width: 14px; height: 14px;`;
     } else if (item.type === 'polygon-outline') {
-        // 🔥 CUADRITO HUECO (Transparente con borde) 🔥
+        // CUADRITO HUECO (Transparente con borde) 
         style = `background-color: transparent; border: 2px solid ${item.color}; width: 14px; height: 14px; box-sizing: border-box;`;
     }
 

@@ -1,7 +1,7 @@
 import { API_URL } from '../config.js';
 
 export function initEditor(map) {
-    console.log("✏️ Inicializando Editor...");
+    console.log("Inicializando Editor...");
 
     const switchEdicion = document.getElementById('switchEdicion');
     const panelSelector = document.getElementById('panel-selector-capa');
@@ -108,7 +108,7 @@ export function initEditor(map) {
             }
 
             const data = await response.json();
-            alert(`✅ ¡Guardado! ID: ${data.id}`);
+            alert(`¡Guardado! ID: ${data.id}`);
 
             // Éxito: Cerrar modal y limpiar
             modalEdicion.hide();
@@ -121,7 +121,7 @@ export function initEditor(map) {
 
         } catch (error) {
             console.error(error);
-            alert("❌ Error al guardar: " + error.message);
+            alert("Error al guardar: " + error.message);
         } finally {
             btnGuardar.innerHTML = textoOriginal;
             btnGuardar.disabled = false;

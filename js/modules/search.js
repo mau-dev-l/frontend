@@ -1,7 +1,7 @@
 // frontend/js/modules/search.js
 
 export function setupSearch(map, capas) {
-    console.log("🔍 Módulo de búsqueda inteligente iniciado");
+    console.log("Módulo de búsqueda inteligente iniciado");
 
     // ==========================================
     // 1. BUSCADOR INTELIGENTE (Colonias)
@@ -35,7 +35,7 @@ export function setupSearch(map, capas) {
             }
         });
 
-        console.log(`📚 Indexadas ${baseDeDatosColonias.length} colonias para búsqueda.`);
+        console.log(`Indexadas ${baseDeDatosColonias.length} colonias para búsqueda.`);
 
         // B. Función para filtrar y mostrar lista
         inputData.addEventListener('input', function() {

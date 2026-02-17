@@ -1,7 +1,7 @@
 // frontend/js/modules/gallery.js
 
 export function initGallery() {
-    console.log("📸 Módulo de Galería (Antes/Después) iniciado...");
+    console.log("Módulo de Galería (Antes/Después) iniciado...");
     injectModalHTML();
     exposeGlobalFunction();
 }
@@ -85,7 +85,7 @@ function exposeGlobalFunction() {
         const rutaAntes = `assets/faismun_2025/${cleanCve}_antes.jpg`;
         const rutaDespues = `assets/faismun_2025/${cleanCve}_despues.jpg`;
 
-        console.log(`🔍 Buscando fotos: ${rutaAntes} y ${rutaDespues}`);
+        console.log(`Buscando fotos: ${rutaAntes} y ${rutaDespues}`);
 
         titulo.innerText = nombreObra || "Detalle de Obra";
         lblClave.innerText = cleanCve;

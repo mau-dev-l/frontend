@@ -10,7 +10,10 @@ import { initDashboardManzanas } from './modules/dashboardManzanas.js';
 import { initLegend } from './modules/legend.js'; 
 import { setupGPS } from './modules/gps.js'; 
 import { initGallery } from './modules/gallery.js'; 
-import { setupCoordSearch } from './modules/searchCoords.js'; // <--- 1. NUEVO IMPORT
+import { setupCoordSearch } from './modules/searchCoords.js';
+
+
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     
@@ -31,8 +34,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+
     // 5. Configurar Sidebar (Switches de capas)
     setupSidebarControls(map, capasOverlay);
+    
+
 
     // 6. Configurar Buscadores (Datos)
     setupSearch(map, capasOverlay);
@@ -60,5 +66,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 13. INICIAR BÚSQUEDA POR COORDENADAS (NUEVO)
     setupCoordSearch(map); // <--- 2. ACTIVAR EL MÓDULO
 
-    console.log("🚀 VISOP 2.0 Iniciado Completamente.");
+    console.log("VISOP 2.0 Iniciado Completamente.");
 });

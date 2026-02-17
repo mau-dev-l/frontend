@@ -1,7 +1,7 @@
 // frontend/js/modules/dashboardManzanas.js
 
 export function initDashboardManzanas(map, capaManzanas) {
-    console.log("👥 Inicializando Dashboard Demográfico Inteligente...");
+    console.log("Inicializando Dashboard Demográfico Inteligente...");
 
     const panel = document.getElementById('panel-demografico');
     const btn = document.getElementById('btn-toggle-demografico');

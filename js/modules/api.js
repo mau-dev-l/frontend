@@ -21,7 +21,7 @@ export async function fetchWFS(layerName) {
         });
 
         const url = `${GEOSERVER_URL}?${params.toString()}`;
-        // console.log(`📡 Consultando GeoServer: ${url}`); 
+        // console.log(`Consultando GeoServer: ${url}`); 
 
         const response = await fetch(url);
 
@@ -33,7 +33,7 @@ export async function fetchWFS(layerName) {
         return data;
 
     } catch (error) {
-        console.error(`❌ Error descargando capa WFS (${layerName}):`, error);
+        console.error(`Error descargando capa WFS (${layerName}):`, error);
         return null;
     }
 }

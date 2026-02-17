@@ -52,10 +52,10 @@ export async function initDashboard() {
             // 2023: Tonos Tierra/Verdes
             renderizarGrafica('chart-pie-2023', etiquetas23, valores23, 'Obras 2023', ['#2a9d8f', '#264653', '#e9c46a', '#f4a261']);
 
-            console.log("✅ Estadísticas actualizadas (3 años).");
+            console.log("Estadísticas actualizadas (3 años).");
 
         } catch (error) {
-            console.error("❌ Error cargando dashboard:", error);
+            console.error("Error cargando dashboard:", error);
             if (kpi2025) kpi2025.innerText = "-";
         }
     }

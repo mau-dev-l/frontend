@@ -12,7 +12,8 @@ export function setupSidebarControls(map, capas) {
         'checkZAP': capas.zap,
         'checkManzanas': capas.manzanas,
         'checkPrediosCB01': capas.predios,
-        'checkLimiteMunicipal': capas.limite
+        'checkLimiteMunicipal': capas.limite,
+        'checkPIM2025': capas.pim2025 // <--- NUEVO
     };
 
     // 1. Apagar el switch maestro "Todas"
@@ -45,10 +46,10 @@ export function setupSidebarControls(map, capas) {
             checkbox.addEventListener('change', (e) => {
                 if (e.target.checked) {
                     map.addLayer(capa);
-                    console.log(`👁️ Capa activada: ${idCheckbox}`);
+                    console.log(`Capa activada: ${idCheckbox}`);
                 } else {
                     map.removeLayer(capa);
-                    console.log(`🙈 Capa desactivada: ${idCheckbox}`);
+                    console.log(`Capa desactivada: ${idCheckbox}`);
                 }
             });
 
