@@ -13,7 +13,9 @@ export function setupSidebarControls(map, capas) {
         'checkManzanas': capas.manzanas,
         'checkPrediosCB01': capas.predios,
         'checkLimiteMunicipal': capas.limite,
-        'checkPIM2025': capas.pim2025 // <--- NUEVO
+        'checkPIM2025': capas.pim2025 ,// 
+        'checkParques': capas.parques_mun,
+        'checkRutas': capas.Rutas_Tuxtla
     };
 
     // 1. Apagar el switch maestro "Todas"

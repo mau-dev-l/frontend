@@ -254,6 +254,48 @@ try {
         });
         console.log(`✅ Manzanas: ${dManzanas.features.length} registros`);
     }
+    const dparques = await fetchWFS('parques_mun');
+     if (dparques?.features) {
+        capas.parques_mun = L.geoJSON(dparques, {
+            onEachFeature: (feature, layer) => {
+                const p = feature.properties;
+                const html = `
+                    <div style="min-width: 220px; font-family: 'Segoe UI', sans-serif; font-size: 13px;">
+                        <div style="background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 4px 4px 0 0; font-weight: bold; margin-bottom: 8px; border-bottom: 2px solid #388E3C;">
+                            <i class="fa-solid fa-tree"></i> Información del Parque
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            <strong style="color: #333;">Nombre del Parque:</strong><br>
+                            <span style="background-color: #eee; padding: 2px 5px; border-radius: 3px;">${p.newfield1 || 'S/D'}</span>
+                        </div>
+                         `;
+                        layer.bindPopup(html);
+            }
+
+        });
+        console.log(`Parques: ${dparques.features.length} registros`);
+    }
+    const drutas = await fetchWFS('Rutas_Tuxtla');
+     if (drutas?.features) {
+        capas.Rutas_Tuxtla = L.geoJSON(drutas, {
+            onEachFeature: (feature, layer) => {
+                const p = feature.properties;
+                const html = `
+                    <div style="min-width: 220px; font-family: 'Segoe UI', sans-serif; font-size: 13px;">
+                        <div style="background-color: #4CAF50; color: white; padding: 5px 10px; border-radius: 4px 4px 0 0; font-weight: bold; margin-bottom: 8px; border-bottom: 2px solid #388E3C;">
+                            <i class="fa-solid fa-tree"></i> Información de la Ruta
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            <strong style="color: #333;">Nombre de la Ruta:</strong><br>
+                            <span style="background-color: #eee; padding: 2px 5px; border-radius: 3px;">${p.route_name || 'S/D'}</span>
+                        </div>
+                         `;
+                        layer.bindPopup(html);
+            }
+
+        });
+        console.log(`Rutas: ${drutas.features.length} registros`);
+    }
 
     // ============================================================
     //  GRUPO 2: CAPAS WMS (Imágenes - Tiles Rápidos)
